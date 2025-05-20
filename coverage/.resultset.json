@@ -1,0 +1,166 @@
+{
+  "RSpec": {
+    "coverage": {
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/helpers/application_helper.rb": {
+        "lines": [
+          1,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/models/directory.rb": {
+        "lines": [
+          1,
+          1,
+          1,
+          1,
+          null,
+          1,
+          47,
+          1,
+          1,
+          4,
+          null,
+          null,
+          1,
+          1,
+          0,
+          null,
+          1,
+          46,
+          24,
+          1,
+          23,
+          1,
+          22,
+          2,
+          null,
+          null,
+          null,
+          1,
+          1,
+          23,
+          3,
+          null,
+          null,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/models/application_record.rb": {
+        "lines": [
+          1,
+          1,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/services/storage_file_path_service.rb": {
+        "lines": [
+          1,
+          1,
+          null,
+          1,
+          18,
+          18,
+          null,
+          null,
+          1,
+          18,
+          null,
+          10,
+          null,
+          null,
+          1,
+          null,
+          1,
+          null,
+          1,
+          18,
+          null,
+          null,
+          1,
+          10,
+          null,
+          null,
+          1,
+          10,
+          10,
+          null,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/services/directory_path_service.rb": {
+        "lines": [
+          1,
+          1,
+          11,
+          null,
+          null,
+          1,
+          11,
+          10,
+          10,
+          null,
+          10,
+          19,
+          19,
+          null,
+          10,
+          null,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/models/storage_file.rb": {
+        "lines": [
+          1,
+          1,
+          1,
+          null,
+          1,
+          1,
+          null,
+          1,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null
+        ]
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/controllers/application_controller.rb": {
+        "lines": [
+          0,
+          null,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/jobs/application_job.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ],
+        "branches": {}
+      },
+      "/Users/danielmatos-pro/www/test_clicksign/app_file_system/app/mailers/application_mailer.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      }
+    },
+    "timestamp": 1747757739
+  }
+}
