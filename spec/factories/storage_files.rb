@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :storage_file do
     sequence(:name) { |n| "file_#{n}.txt" }
+    file_type_storage { :disk }
     association :directory
 
     trait :without_directory do

@@ -73,6 +73,7 @@ group :development, :test do
   gem "faker"
   gem "database_cleaner-active_record"
   gem "simplecov", require: false
+  gem "shoulda-matchers"
 end
 
 group :development do
@@ -84,4 +85,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  gem "webrick"
+  gem "fakes3", group: :test
 end

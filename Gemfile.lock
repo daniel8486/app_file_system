@@ -141,6 +141,10 @@ GEM
       railties (>= 5.0.0)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
+    fakes3 (2.0.0)
+      builder
+      thor
+      xml-simple
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -390,6 +394,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    shoulda-matchers (6.5.0)
+      activesupport (>= 5.2.0)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -455,11 +461,14 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
+    webrick (1.9.1)
     websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    xml-simple (1.1.9)
+      rexml
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.3)
@@ -487,6 +496,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
+  fakes3
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
@@ -501,6 +511,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rails-omakase
   selenium-webdriver
+  shoulda-matchers
   simplecov
   solid_cable
   solid_cache
@@ -510,6 +521,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  webrick
 
 BUNDLED WITH
    2.6.8

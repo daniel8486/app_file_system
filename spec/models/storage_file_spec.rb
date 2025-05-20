@@ -1,91 +1,79 @@
-require "rails_helper"
+require 'rails_helper'
 
-RSpec.describe StorageFilePathService do
-  subject(:path_builder) { described_class.new(storage_file, separator: separator) }
+RSpec.describe StorageFile, type: :model do
+  let(:directory) { create(:directory, name: "Dir Pai") }
 
-  let(:separator) { "/" }
+  describe "associações" do
+    it { should belong_to(:directory) }
+    it { should have_one_attached(:file) }
+  end
 
-  describe "#call" do
-    context "com storage_file e directory via FactoryBot" do
-      let(:directory) { create(:directory, name: "docs") }
-      let(:storage_file) { create(:storage_file, name: "file.txt", directory: directory) }
+  describe "validações" do
+    it { should validate_presence_of(:name) }
 
-      it "retorna o caminho completo" do
-        expect(path_builder.call).to eq("docs/file.txt")
-      end
+    it "não permite nomes duplicados no mesmo diretório" do
+      create(:storage_file, name: "file.txt", directory: directory, file_type_storage: :disk)
+      file2 = build(:storage_file, name: "file.txt", directory: directory, file_type_storage: :disk)
+      expect(file2).not_to be_valid
     end
 
-    context "com doubles válidos" do
-      let(:directory) { instance_double("Directory", dir_path: "docs") }
-      let(:storage_file) { instance_double("StorageFile", name: "file.txt", directory: directory) }
+    it "permite nomes iguais em diretórios diferentes" do
+      dir2 = create(:directory, name: "Outro Dir")
+      create(:storage_file, name: "file.txt", directory: directory, file_type_storage: :disk)
+      file2 = build(:storage_file, name: "file.txt", directory: dir2, file_type_storage: :disk)
+      expect(file2).to be_valid
+    end
+  end
 
-      it "retorna caminho construído corretamente" do
-        expect(path_builder.call).to eq("docs/file.txt")
-      end
+  describe "enum file_type_storage" do
+    it "define os tipos corretamente" do
+      file = build(:storage_file, file_type_storage: :disk)
+      expect(file.disk?).to be true
+
+      file.file_type_storage = :s3
+      expect(file.s3?).to be true
+
+      file.file_type_storage = :blob
+      expect(file.blob?).to be true
+    end
+  end
+
+  describe "#file_path" do
+    it "chama o service e retorna o caminho" do
+      file = build(:storage_file, name: "file.txt", directory: directory)
+      expect(StorageFilePathService).to receive(:new).with(file).and_call_original
+      file.file_path
     end
 
-    context "arquivo sem diretório (usando double)" do
-      let(:storage_file) { instance_double("StorageFile", name: "file.txt", directory: nil) }
+    it "retorna o caminho correto" do
+      file = create(:storage_file, name: "file.txt", directory: directory)
+      expect(file.file_path).to eq("Dir Pai/file.txt")
+    end
+  end
 
-      it "retorna apenas o nome do arquivo" do
-        expect(path_builder.call).to eq("file.txt")
-      end
+  describe "#content_type" do
+    let(:file) { build(:storage_file, file_type_storage: :blob) }
+
+    it "retorna blob_data se for blob" do
+      allow(file).to receive(:blob?).and_return(true)
+      allow(file).to receive(:blob_data).and_return("image/png")
+      expect(file.content_type).to eq("image/png")
     end
 
-    context "arquivo é nil" do
-      let(:storage_file) { nil }
+    it "retorna file.download se file estiver attached" do
+      allow(file).to receive(:blob?).and_return(false)
+      fake_attachment = double("ActiveStorage::Attachment", attached?: true, download: "file-content")
+      allow(file).to receive(:file).and_return(fake_attachment)
 
-      it "retorna string vazia" do
-        expect(path_builder.call).to eq("")
-      end
+      expect(file.content_type).to eq("file-content")
     end
 
-    context "arquivo sem nome (usando double)" do
-      let(:storage_file) { instance_double("StorageFile", name: nil, directory: nil) }
+    it "retorna nil se não for blob e não tiver file" do
+      allow(file).to receive(:blob?).and_return(false)
+      fake_attachment = double("ActiveStorage::Attachment", attached?: false)
+      allow(file).to receive(:file).and_return(fake_attachment)
 
-      it "retorna string vazia" do
-        expect(path_builder.call).to eq("")
-      end
-    end
-
-    context "com separador customizado '-'" do
-      let(:separator) { "-" }
-      let(:directory) { instance_double("Directory", dir_path: "docs") }
-      let(:storage_file) { instance_double("StorageFile", name: "file.txt", directory: directory) }
-
-      it "usa o separador corretamente" do
-        expect(path_builder.call).to eq("docs-file.txt")
-      end
-    end
-
-    context "objeto que não responde a name" do
-      let(:storage_file) { Object.new }
-
-      it "retorna string vazia" do
-        expect(path_builder.call).to eq("")
-      end
-    end
-
-    context "diretório sem método dir_path" do
-      let(:directory) { double("Directory") }
-      let(:storage_file) { double("StorageFile", name: "file.txt", directory: directory) }
-
-      it "retorna só o nome do arquivo" do
-        expect(path_builder.call).to eq("file.txt")
-      end
-    end
-
-    context "objeto responde false a respond_to?(:name)" do
-      let(:directory) { double("Directory", dir_path: "docs") }
-      let(:storage_file) do
-        obj = double("StorageFile", name: "file.txt", directory: directory)
-        allow(obj).to receive(:respond_to?).with(:name).and_return(false)
-        obj
-      end
-
-      it "retorna string vazia" do
-        expect(path_builder.call).to eq("")
-      end
+      expect(file.content_type).to be_nil
     end
   end
 end

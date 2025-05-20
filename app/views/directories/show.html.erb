@@ -1,0 +1,27 @@
+
+<h1><%= @directory.name %></h1>
+<p>Pai: <%= @directory.parent&.name || "Raiz" %></p>
+
+<h2>Subdiretórios</h2>
+<ul>
+  <% @directory.subdirectories.each do |sub| %>
+    <li><%= link_to sub.name, directory_path(sub) %></li>
+  <% end %>
+</ul>
+<%= link_to 'Adicionar Subdiretório', new_directory_path(parent_id: @directory.id) %>
+
+<h2>Arquivos</h2>
+<ul>
+  <% @directory.storage_files.each do |file| %>
+    <li>
+      <%= link_to file.name, [@directory, file] %>
+      (<%= link_to 'Download', download_directory_storage_file_path(@directory, file), target: "_blank" %>)
+      (<%= link_to 'Editar', edit_directory_storage_file_path(@directory, file) %>)
+      (<%= link_to 'Excluir', directory_storage_file_path(@directory, file), method: :delete, data: { confirm: 'Tem certeza?' } %>)
+    </li>
+  <% end %>
+</ul>
+<%= link_to 'Adicionar Arquivo', new_directory_storage_file_path(@directory) %>
+
+<%= link_to 'Editar Diretório', edit_directory_path(@directory) %> |
+<%= link_to 'Voltar', directories_path %>

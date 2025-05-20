@@ -1,0 +1,6 @@
+<h1>Arquivos em <%= @directory.name %></h1>
+<ul>
+  <% @storage_files.each do |file| %>
+    <li><%= file.name %></li>
+  <% end %>
+</ul>

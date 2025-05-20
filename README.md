@@ -95,6 +95,31 @@ open coverage/index.html
 
 ---
 
+## Testando com S3 Local (LocalStack)
+
+Para testar o armazenamento S3 localmente, siga os passos abaixo:
+
+1. **Suba o LocalStack usando Docker Compose:**
+   ```sh
+   docker-compose up -d
+   ```
+
+2. **Crie o bucket S3 no LocalStack usando a AWS CLI:**
+   ```sh
+   aws --endpoint-url=http://localhost:4566 s3 mb s3://test-bucket --region us-east-1 --no-sign-request
+   ```
+
+3. **Garanta que o serviço `test_s3` está configurado em `config/storage.yml` e selecionado no ambiente de teste (`config/environments/test.rb`).**
+
+Assim, seus testes Active Storage irão utilizar o S3 simulado pelo LocalStack.
+
+4. **Rode os Testes** 
+  ```sh 
+  bundle exec rspec 
+  ```
+  
+---
+
 ## CI/CD
 
 - **CI:** Exemplo de configuração com GitHub Actions disponível para rodar testes automaticamente em cada push/pull request.

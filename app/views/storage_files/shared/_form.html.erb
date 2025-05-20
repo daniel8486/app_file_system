@@ -1,0 +1,27 @@
+<%= form_with(model: [@directory, storage_file], local: true) do |form| %>
+  <% if storage_file.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(storage_file.errors.count, "erro") %>:</h2>
+      <ul>
+        <% storage_file.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= form.label :name, "Nome" %>
+    <%= form.text_field :name %>
+  </div>
+  <div>
+    <%= form.label :file, "Arquivo" %>
+    <%= form.file_field :file %>
+  </div>
+  <div>
+    <%= form.label :file_type_storage, "Tipo de Armazenamento" %>
+    <%= form.select :file_type_storage, StorageFile.file_type_storages.keys.map { |k| [k, k] } %>
+  </div>
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

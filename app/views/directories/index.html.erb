@@ -1,0 +1,11 @@
+<h1>Diretórios</h1>
+<%= link_to 'Novo Diretório', new_directory_path %>
+<ul>
+  <% @directories.each do |dir| %>
+    <li>
+      <%= link_to dir.name, directory_path(dir) %>
+      (<%= link_to 'Editar', edit_directory_path(dir) %>)
+      (<%= link_to 'Excluir', directory_path(dir), method: :delete, data: { confirm: 'Tem certeza?' } %>)
+    </li>
+  <% end %>
+</ul>
