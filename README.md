@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este projeto implementa um sistema de arquivos persistido em banco de dados SQL, onde é possível criar diretórios e arquivos, com suporte a subdiretórios e múltiplos tipos de armazenamento de arquivos (blob, S3 ou disco). O sistema foi desenvolvido em Ruby on Rails, seguindo princípios de Clean Code, SRP (Single Responsibility Principle) e com cobertura de testes automatizados.
+Este projeto implementa um sistema de arquivos persistido em banco de dados SQL, permitindo criar diretórios e arquivos, com suporte a subdiretórios e múltiplos tipos de armazenamento de arquivos (blob, S3 ou disco). O sistema foi desenvolvido em Ruby on Rails, seguindo princípios de Clean Code, SRP (Single Responsibility Principle) e com cobertura de testes automatizados.
 
 ---
 
@@ -53,18 +53,21 @@ app/
   services/
     directory_path_service.rb
     storage_file_path_service.rb
+  controllers/
+    directories_controller.rb
+    storage_files_controller.rb
+  views/
+    directories/
+    storage_files/
   assets/
     stylesheets/
     images/
-    config/
   javascript/
     controllers/
-  views/
-    layouts/
-    pwa/
 spec/
   models/
   services/
+  requests/
   factories/
   rails_helper.rb
   spec_helper.rb
@@ -72,89 +75,96 @@ spec/
 
 ---
 
-## Testes
+## Dicas Sênior para Rodar e Testar
 
-- **Framework:** RSpec
-- **Cobertura:** Utiliza SimpleCov para medir cobertura de código.
-- **Tipos de Teste:**
-  - **Unitários:** Models e services.
-  - **Integração:** Criação de diretórios e arquivos, validação de regras de negócio, exclusão em cascata.
-  - **Casos de borda:** Nomes nulos, ciclos, diretórios órfãos, etc.
+### 1. **Dependências**
 
-### Como rodar os testes
-
-```sh
-bundle exec rspec
-```
-
-### Como visualizar a cobertura
-
-```sh
-open coverage/index.html
-```
-
----
-
-## Testando com S3 Local (LocalStack)
-
-Para testar o armazenamento S3 localmente, siga os passos abaixo:
-
-1. **Suba o LocalStack usando Docker Compose:**
-   ```sh
-   docker-compose up -d
-   ```
-
-2. **Crie o bucket S3 no LocalStack usando a AWS CLI:**
-   ```sh
-   aws --endpoint-url=http://localhost:4566 s3 mb s3://test-bucket --region us-east-1 --no-sign-request
-   ```
-
-3. **Garanta que o serviço `test_s3` está configurado em `config/storage.yml` e selecionado no ambiente de teste (`config/environments/test.rb`).**
-
-Assim, seus testes Active Storage irão utilizar o S3 simulado pelo LocalStack.
-
-4. **Rode os Testes** 
-  ```sh 
-  bundle exec rspec 
+- Use a versão correta do Ruby e Rails conforme especificado no projeto.
+- Instale todas as dependências:
+  ```sh
+  bundle install
+  yarn install # se usar assets JS/CSS modernos
   ```
-  
----
 
-## CI/CD
+### 2. **Configuração do Banco de Dados**
 
-- **CI:** Exemplo de configuração com GitHub Actions disponível para rodar testes automaticamente em cada push/pull request.
-- **Arquivo de workflow:** `.github/workflows/ci.yml`
-- **Banco de dados:** PostgreSQL configurado para ambiente de CI.
+- Crie e migre o banco:
+  ```sh
+  rails db:create db:migrate
+  ```
 
----
+### 3. **Rodando o Servidor**
 
-## Como rodar o projeto localmente
+- Inicie o servidor Rails:
+  ```sh
+  rails s
+  ```
+- Acesse em [http://localhost:3000](http://localhost:3000)
 
-1. Instale as dependências:
-   ```sh
-   bundle install
-   yarn install # se usar assets JS/CSS modernos
-   ```
+### 4. **Testes**
 
-2. Configure o banco de dados:
-   ```sh
-   rails db:create db:migrate
-   ```
+- Rode todos os testes:
+  ```sh
+  bundle exec rspec
+  ```
+- Visualize a cobertura de código (após rodar os testes):
+  ```sh
+  open coverage/index.html
+  ```
 
-3. Rode o servidor:
-   ```sh
-   rails s
-   ```
+### 5. **Testando S3 Localmente (com LocalStack)**
 
-4. Acesse em [http://localhost:3000](http://localhost:3000)
+- Suba o LocalStack usando Docker Compose:
+  ```sh
+  docker-compose up -d
+  ```
+- Crie o bucket S3 usando AWS CLI:
+  ```sh
+  aws --endpoint-url=http://localhost:4566 s3 mb s3://test-bucket --region us-east-1 --no-sign-request
+  ```
+- Garanta que o serviço `test_s3` está configurado em `config/storage.yml` e selecionado no ambiente de teste.
+- Rode os testes normalmente; uploads irão para o LocalStack.
 
----
+### 6. **Testando Blob (no banco de dados)**
 
-## Observações
+- O model suporta armazenar arquivos como blob no banco. Para isso, garanta que a coluna `blob_data` existe e use o valor `blob` no enum.
+- **Atenção:** Armazenar arquivos grandes no banco não é recomendado para produção, mas é suportado para fins acadêmicos/demonstração.
 
-- O projeto está preparado para expansão, com fácil integração de novos tipos de armazenamento ou regras de negócio.
-- Mensagens de erro e validações são claras e amigáveis.
-- Código pronto para produção, seguindo padrões de projetos Rails de alta qualidade.
+### 7. **Problemas Comuns & Soluções**
+
+- **Rota de download ausente:**  
+  Certifique-se de que seu `routes.rb` inclui:
+  ```ruby
+  resources :directories do
+    resources :storage_files do
+      member do
+        get :download
+      end
+    end
+  end
+  ```
+- **Ação download não encontrada:**  
+  Implemente a action `download` no `StorageFilesController` conforme mostrado no código.
+- **Erro 406 Not Acceptable nos request specs:**  
+  Use `as: :html` nos specs para garantir resposta HTML.
+
+### 8. **CI/CD**
+
+- Exemplo de workflow do GitHub Actions disponível em `.github/workflows/ci.yml`.
+- Projeto pronto para testes automatizados a cada push/pull request.
+- Usa PostgreSQL no ambiente de CI.
+
+### 9. **Extensibilidade**
+
+- O código é modular e pronto para novos tipos de armazenamento ou regras de negócio.
+- Para adicionar novos backends de storage, basta estender o enum e implementar a lógica necessária.
+
+### 10. **Boas Práticas Gerais**
+
+- Mantenha os testes sempre atualizados ao adicionar novas features.
+- Use factories para dados de teste, mantendo os specs limpos e fáceis de manter.
+- Use service objects para lógicas de negócio que não pertencem a models ou controllers.
+- Documente qualquer lógica customizada ou não óbvia diretamente no código.
 
 ---
 
