@@ -51,29 +51,66 @@ RSpec.describe StorageFile, type: :model do
     end
   end
 
-  describe "#content_type" do
-    let(:file) { build(:storage_file, file_type_storage: :blob) }
+  describe "#file_content_type" do
+    let(:file) { build(:storage_file) }
 
-    it "retorna blob_data se for blob" do
-      allow(file).to receive(:blob?).and_return(true)
-      allow(file).to receive(:blob_data).and_return("image/png")
-      expect(file.content_type).to eq("image/png")
-    end
-
-    it "retorna file.download se file estiver attached" do
-      allow(file).to receive(:blob?).and_return(false)
-      fake_attachment = double("ActiveStorage::Attachment", attached?: true, download: "file-content")
+    it "retorna o content_type do arquivo anexado" do
+      fake_blob = double("ActiveStorage::Blob", content_type: "image/png")
+      fake_attachment = double("ActiveStorage::Attachment", attached?: true, blob: fake_blob)
       allow(file).to receive(:file).and_return(fake_attachment)
 
-      expect(file.content_type).to eq("file-content")
+      expect(file.file_content_type).to eq("image/png")
     end
 
-    it "retorna nil se não for blob e não tiver file" do
-      allow(file).to receive(:blob?).and_return(false)
+    it "retorna nil se não houver arquivo anexado" do
       fake_attachment = double("ActiveStorage::Attachment", attached?: false)
       allow(file).to receive(:file).and_return(fake_attachment)
 
-      expect(file.content_type).to be_nil
+      expect(file.file_content_type).to be_nil
+    end
+  end
+
+  describe "#human_readable_type" do
+    let(:file) { build(:storage_file) }
+
+    it "retorna 'Imagem' para tipos MIME que contenham 'image'" do
+      allow(file).to receive(:file_content_type).and_return("image/jpeg")
+      expect(file.human_readable_type).to eq("Imagem")
+    end
+
+    it "retorna 'Documento PDF' para tipos MIME que contenham 'pdf'" do
+      allow(file).to receive(:file_content_type).and_return("application/pdf")
+      expect(file.human_readable_type).to eq("Documento PDF")
+    end
+
+    it "retorna 'Arquivo Compactado' para tipos MIME que contenham 'zip'" do
+      allow(file).to receive(:file_content_type).and_return("application/zip")
+      expect(file.human_readable_type).to eq("Arquivo Compactado")
+    end
+
+    it "retorna 'JSON' para tipos MIME que contenham 'json'" do
+      allow(file).to receive(:file_content_type).and_return("application/json")
+      expect(file.human_readable_type).to eq("JSON")
+    end
+
+    it "retorna 'Planilha CSV' para tipos MIME que contenham 'csv'" do
+      allow(file).to receive(:file_content_type).and_return("text/csv")
+      expect(file.human_readable_type).to eq("Planilha CSV")
+    end
+
+    it "retorna 'Texto' para tipos MIME que contenham 'text'" do
+      allow(file).to receive(:file_content_type).and_return("text/plain")
+      expect(file.human_readable_type).to eq("Texto")
+    end
+
+    it "retorna 'Arquivo' para tipos MIME desconhecidos" do
+      allow(file).to receive(:file_content_type).and_return("application/xyz")
+      expect(file.human_readable_type).to eq("Arquivo")
+    end
+
+    it "retorna nil se não houver tipo MIME" do
+      allow(file).to receive(:file_content_type).and_return(nil)
+      expect(file.human_readable_type).to be_nil
     end
   end
 end

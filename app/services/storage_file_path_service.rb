@@ -26,6 +26,7 @@ class StorageFilePathService
 
   def directory_path
     directory = storage_file.respond_to?(:directory) ? storage_file.directory : nil
-    directory&.respond_to?(:dir_path) ? directory.dir_path : nil
+    path = directory&.respond_to?(:dir_path) ? directory.dir_path : nil
+    path.to_s.strip.empty? ? nil : path
   end
 end

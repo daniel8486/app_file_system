@@ -172,3 +172,137 @@ spec/
 
 Desenvolvido por danieldjam  
 Contato: [eu@danieldjam.dev.br]
+
+# Lógica do Sistema de Arquivos Persistente - Ruby on Rails
+
+## Visão Geral
+
+O sistema implementa uma estrutura de arquivos e diretórios persistida em banco de dados SQL, permitindo criar, navegar, editar e excluir diretórios e arquivos. Os arquivos podem ser armazenados em três tipos de backend: como blob no banco, em disco local ou em S3 (compatível com AWS ou LocalStack).
+
+---
+
+## Estrutura de Dados
+
+### Diretórios (`Directory`)
+
+- **Hierarquia:**  
+  Cada diretório pode ter um diretório pai (`parent_id`) e vários subdiretórios (`subdirectories`).  
+  Isso permite criar árvores de diretórios de profundidade ilimitada.
+- **Validações:**  
+  - O nome é obrigatório e único entre os irmãos (mesmo diretório pai).
+  - Não permite ciclos (um diretório não pode ser seu próprio pai ou descendente).
+- **Métodos utilitários:**  
+  - `dir_path`: retorna o caminho completo do diretório, usando um service para montar a string (ex: `raiz/subpasta/pasta`).
+
+### Arquivos (`StorageFile`)
+
+- **Associação:**  
+  Todo arquivo pertence a um diretório.
+- **Validações:**  
+  - Nome obrigatório e único dentro do diretório.
+- **Tipos de armazenamento:**  
+  - Enum `file_type_storage` define se o arquivo será salvo como `blob` (no banco), `disk` (local) ou `s3` (remoto).
+- **Conteúdo:**  
+  - Se `blob`, o conteúdo é salvo na coluna `blob_data` (tipo binário).
+  - Se `disk` ou `s3`, o arquivo é gerenciado pelo Active Storage.
+- **Métodos utilitários:**  
+  - `content_type`: retorna o conteúdo do arquivo conforme o tipo de armazenamento.
+  - `file_path`: retorna o caminho completo do arquivo, usando um service.
+
+---
+
+## Serviços (`Services`)
+
+- **DirectoryPathService:**  
+  Responsável por montar o caminho completo de um diretório, concatenando os nomes dos ancestrais até o diretório atual.
+- **StorageFilePathService:**  
+  Responsável por montar o caminho completo de um arquivo, incluindo o caminho do diretório e o nome do arquivo.
+
+---
+
+## Controllers
+
+### Diretórios (`DirectoriesController`)
+
+- **index:** Lista todos os diretórios raiz.
+- **show:** Exibe detalhes do diretório, subdiretórios e arquivos.
+- **new/create:** Cria novos diretórios, podendo ser raiz ou subdiretórios.
+- **edit/update:** Edita diretórios existentes.
+- **destroy:** Remove diretórios e todos os seus descendentes (subdiretórios e arquivos).
+
+### Arquivos (`StorageFilesController`)
+
+- **index:** Lista arquivos de um diretório.
+- **show:** Exibe detalhes de um arquivo.
+- **new/create:** Cria arquivos em um diretório, escolhendo o tipo de armazenamento.
+- **edit/update:** Edita arquivos existentes.
+- **destroy:** Remove arquivos.
+- **download:** Permite baixar o arquivo, independente do tipo de armazenamento:
+  - Se `blob`, envia o conteúdo binário.
+  - Se `disk` ou `s3`, redireciona para a URL gerada pelo Active Storage.
+
+---
+
+## Views
+
+- **Diretórios:**  
+  - Listagem, criação, edição e navegação entre subdiretórios.
+  - Exibição dos arquivos contidos em cada diretório.
+- **Arquivos:**  
+  - Listagem, criação, edição e download.
+  - Formulário permite escolher o tipo de armazenamento.
+
+---
+
+## Fluxo de Criação e Download de Arquivos
+
+1. **Usuário acessa um diretório e escolhe "Adicionar Arquivo".**
+2. **No formulário, seleciona o arquivo e o tipo de armazenamento (blob, disk, s3).**
+3. **Ao salvar:**
+   - Se `blob`, o conteúdo é salvo na coluna `blob_data`.
+   - Se `disk` ou `s3`, o arquivo é salvo via Active Storage.
+4. **Na listagem, cada arquivo tem um link de download.**
+5. **Ao clicar em download:**
+   - Se `blob`, o controller envia o conteúdo binário.
+   - Se `disk` ou `s3`, o controller redireciona para a URL do Active Storage.
+
+---
+
+## Testes
+
+- **Cobertura de models:**  
+  Validações, associações, enums e métodos utilitários.
+- **Cobertura de services:**  
+  Montagem de caminhos, casos de borda e uso de doubles.
+- **Cobertura de requests:**  
+  Testes de controllers para garantir respostas corretas e integração entre camadas.
+
+---
+
+## Extensibilidade
+
+- **Novo tipo de armazenamento:**  
+  Basta adicionar ao enum e implementar a lógica correspondente no model/controller.
+- **Novas regras de negócio:**  
+  Adicione validações ou métodos utilitários conforme necessário.
+- **Escalabilidade:**  
+  Estrutura modular facilita manutenção e evolução do sistema.
+
+---
+
+## Dicas Sênior
+
+- Use sempre services para lógica de negócio fora dos models/controllers.
+- Mantenha os testes atualizados e com boa cobertura.
+- Documente decisões arquiteturais e regras customizadas no README e no código.
+- Prefira enums e validações contextuais para garantir integridade dos dados.
+- Use ferramentas como LocalStack para testar integrações com S3 localmente.
+
+---
+
+## Resumo
+
+O sistema é robusto, modular, seguro e pronto para produção ou evolução.  
+Permite criar e gerenciar uma árvore de diretórios e arquivos, com múltiplos tipos de armazenamento, e está preparado para ser expandido conforme novas necessidades do negócio.
+
+---

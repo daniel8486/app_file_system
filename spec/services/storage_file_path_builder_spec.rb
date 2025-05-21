@@ -64,5 +64,23 @@ RSpec.describe StorageFilePathService do
       allow(storage_file).to receive(:respond_to?).with(:directory).and_return(true)
       expect(described_class.new(storage_file).call).to eq('file.txt')
     end
+
+    it 'retorna nome do arquivo se directory.dir_path for nil' do
+      directory = double('Directory', dir_path: nil)
+      storage_file = double('StorageFile', name: 'file.txt', directory: directory)
+      # allow(storage_file).to receive(:respond_to?).and_call_original
+      allow(storage_file).to receive(:respond_to?).with(:name).and_return(true)
+      allow(storage_file).to receive(:respond_to?).with(:directory).and_return(true)
+      expect(described_class.new(storage_file).call).to eq('file.txt')
+    end
+
+     it 'retorna nome do arquivo se directory.dir_path for string vazia' do
+       directory = double('Directory', dir_path: '')
+       storage_file = double('StorageFile', name: 'file.txt', directory: directory)
+       # allow(storage_file).to receive(:respond_to?).and_call_original
+       allow(storage_file).to receive(:respond_to?).with(:name).and_return(true)
+       allow(storage_file).to receive(:respond_to?).with(:directory).and_return(true)
+       expect(described_class.new(storage_file).call).to eq('file.txt')
+     end
   end
 end
