@@ -31,7 +31,7 @@ jobs:
       DATABASE_URL: postgres://postgres:password@localhost:5432/test
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
