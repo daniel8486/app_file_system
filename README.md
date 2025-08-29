@@ -75,7 +75,7 @@ spec/
 
 ---
 
-## Dicas Sênior para Rodar e Testar
+## Dicas para Rodar e Testar
 
 ### 1. **Dependências**
 
@@ -290,7 +290,7 @@ O sistema implementa uma estrutura de arquivos e diretórios persistida em banco
 
 ---
 
-## Dicas Sênior
+## Dicas
 
 - Use sempre services para lógica de negócio fora dos models/controllers.
 - Mantenha os testes atualizados e com boa cobertura.
