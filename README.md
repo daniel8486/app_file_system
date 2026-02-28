@@ -302,6 +302,10 @@ O sistema implementa uma estrutura de arquivos e diretórios persistida em banco
 
 ## Resumo
 
+---
+
+##
+
 O sistema é robusto, modular, seguro e pronto para produção ou evolução.  
 Permite criar e gerenciar uma árvore de diretórios e arquivos, com múltiplos tipos de armazenamento, e está preparado para ser expandido conforme novas necessidades do negócio.
 
